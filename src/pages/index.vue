@@ -13,9 +13,12 @@
 <script>
   export default {
     data: () => ({
-
+      isLogin:false
     }),
     methods: {
+
+    },
+    mounted(){
 
     }
   }

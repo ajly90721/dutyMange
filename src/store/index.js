@@ -1,9 +1,11 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import card from "./card"
+import task from "./task"
+import taskrecord from "./taskrecord"
 
-
-import {getTimeInterval} from '../utils/index'
+import {getTimeInterval} from '../utils/utils'
+import {login} from '../utils/api';
 
 Vue.use(Vuex)
 // 略:后台获取系统运行时间
@@ -13,7 +15,9 @@ const state = {
     loading: false,
     runTimeInterval: '',
     socials: '',
-    websiteInfo: ''
+    websiteInfo: '',
+    user:{staffId:-1, position:"", name:"李华", department:"DK"},
+    // token:null
 }
 const mutations = {
     SET_LOADING: (state, v) => {
@@ -32,7 +36,16 @@ const mutations = {
                 state.runTimeInterval = getTimeInterval(runAt);
             }, 1000);
         }
-    }
+    },
+    setUser: (state, v) => {
+        // console.log(v)
+        state.user = v.data[0];
+        state.token = v.data[1];
+        // console.log("用户：")
+        // console.log(state.user)
+        // console.log("token：")
+        // console.log(state.token)
+    },
 }
 const actions = {
     setLoading: ({commit}, v) => {
@@ -41,6 +54,15 @@ const actions = {
     initComputeTime: ({commit}) => {
         commit('GET_RUNTIME_INTERVAL');
     },
+    login: ({commit,state},str) =>{
+        return new Promise(resolve => {
+          login(str).then(res => {
+                console.log(res.data); 
+                resolve(res.data); 
+                commit({type:"setUser", data:res.data.data});
+                }).catch(err => {console.log(err); resolve({});})
+            })
+        }, 
 
 
 }
@@ -53,6 +75,6 @@ export default new Vuex.Store({
     state,
     mutations,
     actions,
-    modules: {card},
+    modules: {card,task,taskrecord},
     getters
 })
